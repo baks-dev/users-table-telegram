@@ -24,10 +24,10 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Users\UsersTableTelegram\Repository\UserTableBy\Tests;
+namespace BaksDev\Users\UsersTableTelegram\Repository\UserTableInfo\Tests;
 
-use BaksDev\Users\UsersTableTelegram\Repository\UserTableBy\UserTableInfoRepository;
-use BaksDev\Users\UsersTableTelegram\Repository\UserTableBy\UserTableInfoResult;
+use BaksDev\Users\UsersTableTelegram\Repository\UserTableInfo\UserTableInfoRepository;
+use BaksDev\Users\UsersTableTelegram\Repository\UserTableInfo\UserTableInfoResult;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
@@ -36,7 +36,7 @@ use Symfony\Component\DependencyInjection\Attribute\When;
  * @group users-table-telegram
  */
 #[When(env: 'test')]
-class UserTableByRepositoryTest extends KernelTestCase
+class UserTableInfoRepositoryTest extends KernelTestCase
 {
     public function testUserTableInfoResult(): void
     {

@@ -37,7 +37,7 @@ use BaksDev\Telegram\Builder\ReplyKeyboardMarkup\ReplyKeyboardMarkup;
 use BaksDev\Telegram\Request\Type\TelegramRequestCallback;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\UsersTable\Security\Table\Role as UserTableRole;
-use BaksDev\Users\UsersTableTelegram\Repository\UserTableBy\UserTableInfoRepository;
+use BaksDev\Users\UsersTableTelegram\Repository\UserTableInfo\UserTableInfoRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -49,8 +49,6 @@ use Twig\Environment;
 #[AsMessageHandler()]
 final readonly class TelegramUserTableHandler
 {
-    private const string ROUTE_NAME = 'users-table:admin.table.index';
-
     private CacheInterface $cache;
 
     public function __construct(
@@ -83,18 +81,18 @@ final readonly class TelegramUserTableHandler
             return;
         }
 
-        $tableUrl = $this->router->generate(name: self::ROUTE_NAME, referenceType: UrlGeneratorInterface::ABSOLUTE_URL);
+        $tableUrl = $this->router->generate(name: 'users-table:admin.table.index', referenceType: UrlGeneratorInterface::ABSOLUTE_URL);
 
         /** Профиль пользователя по id телеграм чата */
         $profile = $this->activeProfileByAccountTelegram->findByChat($telegramRequest->getChatId());
 
         if(false === ($profile instanceof UserProfileUid))
         {
-            $this->logger->critical('Запрос от не авторизированного пользователя');
+            $this->logger->warning('Запрос от не авторизированного пользователя');
             return;
         }
 
-        $cacheKey = $profile.':'.$telegramRequest->getChatId();
+        $cacheKey = md5($telegramRequest->getChatId().$profile);
 
         /**
          * Идентификатор профиля, к которому есть доступ
@@ -104,22 +102,24 @@ final readonly class TelegramUserTableHandler
 
         if(is_null($authority))
         {
-            $this->logger->info('Не найден идентификатор $authority');
+            $this->logger->warning(__CLASS__.':'.__LINE__.'Не найден идентификатор $authority', ['$authority' => $authority]);
             return;
         }
-
-        $date = new \DateTimeImmutable('19-05-2025'); // @TODO удалить при релизе
 
         /** Информация о табеле сотрудника */
         $userTableInfo = $this->tableByRepository
             ->onUserProfile($profile)
             ->onAuthority($authority)
-            //            ->onDate($date) // @TODO удалить при релизе
             ->toArray();
+
+        /** Готовим сообщение для отправки */
+        $this
+            ->telegramSendMessage
+            ->chanel($telegramRequest->getChatId());
 
         if(false === $userTableInfo)
         {
-            $this->logger->info('Табель учета выполненных работ не найден', ['$profile' => $profile, '$authority' => $authority]);
+            $this->logger->warning('Табель учета выполненных работ не найден', ['$profile' => $profile, '$authority' => $authority]);
 
             /** Клавиатура */
             $inlineKeyboard = new ReplyKeyboardMarkup;
@@ -127,7 +127,7 @@ final readonly class TelegramUserTableHandler
             $inlineKeyboard->addNewRow(
                 (new ReplyKeyboardButton)
                     ->setText('Выход')
-                    ->setCallbackData(TelegramDeleteMessageHandler::KEY)
+                    ->setCallbackData(TelegramDeleteMessageHandler::DELETE_KEY)
             );
 
             /** Сообщаем об ошибке */
@@ -137,6 +137,8 @@ final readonly class TelegramUserTableHandler
                 ->markup($inlineKeyboard)
                 ->delete([$telegramRequest->getId(), $telegramRequest->getLast()])
                 ->send();
+
+            $message->complete();
 
             return;
         }
@@ -168,7 +170,7 @@ final readonly class TelegramUserTableHandler
             $inlineKeyboard->addNewRow(
                 (new ReplyKeyboardButton)
                     ->setText('Выход')
-                    ->setCallbackData(TelegramDeleteMessageHandler::KEY)
+                    ->setCallbackData(TelegramDeleteMessageHandler::DELETE_KEY)
             );
 
             /** Сообщаем об ошибке */
@@ -178,20 +180,19 @@ final readonly class TelegramUserTableHandler
                 ->markup($inlineKeyboard)
                 ->send();
 
-            // $message->complete();
+            $message->complete();
 
             return;
         }
 
         $this
             ->telegramSendMessage
-            ->chanel($telegramRequest->getChatId())
             ->message($render)
             ->markup($inlineKeyboard)
             ->delete([$telegramRequest->getId(), $telegramRequest->getLast()])
             ->send();
 
-        // $message->complete();
+        $message->complete();
     }
 
     private function keyboard(): array|null
@@ -202,7 +203,7 @@ final readonly class TelegramUserTableHandler
         $backButton = new ReplyKeyboardButton;
         $backButton
             ->setText('Выход')
-            ->setCallbackData(TelegramDeleteMessageHandler::KEY);
+            ->setCallbackData(TelegramDeleteMessageHandler::DELETE_KEY);
 
         $inlineKeyboard->addNewRow($backButton);
 

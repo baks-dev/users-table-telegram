@@ -24,7 +24,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Users\UsersTableTelegram\Repository\UserTableBy;
+namespace BaksDev\Users\UsersTableTelegram\Repository\UserTableInfo;
 
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Products\Category\Entity\CategoryProduct;
