@@ -1,0 +1,13 @@
+{# @var table \BaksDev\Users\UsersTableTelegram\Repository\UserTableBy\UserTableInfoResult #}
+
+Здравствуйте {{ tableUserInfo|first.usersProfileUsername }}!
+
+Табель по состоянию на:<b> {{ tableUserInfo|first.tableDate|date('d-m-Y') }}</b>
+
+{% for table in tableUserInfo %}
+    <i>Действие:</i> {{ table.tableWorking }}
+    <i>Количество:</i> <b>{{ table.tableQuantity }}</b>
+    =======================================
+{% endfor %}
+
+Полная информации о вашем табеле по <a href="{{ tableUrl }}">ссылке</a>
