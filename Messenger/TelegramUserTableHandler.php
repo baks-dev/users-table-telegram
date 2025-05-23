@@ -88,7 +88,7 @@ final readonly class TelegramUserTableHandler
 
         if(false === ($profile instanceof UserProfileUid))
         {
-            $this->logger->warning('Запрос от не авторизированного пользователя');
+            $this->logger->warning(__CLASS__.':'.__LINE__.'Запрос от не авторизированного пользователя');
             return;
         }
 
@@ -119,7 +119,7 @@ final readonly class TelegramUserTableHandler
 
         if(false === $userTableInfo)
         {
-            $this->logger->warning('Табель учета выполненных работ не найден', ['$profile' => $profile, '$authority' => $authority]);
+            $this->logger->warning(__CLASS__.':'.__LINE__.'Табель учета выполненных работ не найден', ['$profile' => $profile, '$authority' => $authority]);
 
             /** Клавиатура */
             $inlineKeyboard = new ReplyKeyboardMarkup;
@@ -154,7 +154,7 @@ final readonly class TelegramUserTableHandler
         }
         catch(\Exception $exception)
         {
-            $this->logger->critical('Ошибка рендера шаблона @users-table-telegram:bot/table.html.twig', ['chatId' => $telegramRequest->getChatId()]);
+            $this->logger->critical(__CLASS__.':'.__LINE__.'Ошибка рендера шаблона @users-table-telegram:bot/table.html.twig', ['chatId' => $telegramRequest->getChatId()]);
             return;
         }
 
@@ -162,8 +162,6 @@ final readonly class TelegramUserTableHandler
 
         if(is_null($inlineKeyboard))
         {
-            $this->logger->critical('Ошибка создания клавиатуры для чата');
-
             /** Клавиатура */
             $inlineKeyboard = new ReplyKeyboardMarkup;
             /** Кнопка назад */
@@ -176,7 +174,7 @@ final readonly class TelegramUserTableHandler
             /** Сообщаем об ошибке */
             $this
                 ->telegramSendMessage
-                ->message('<b>Внутренняя ошибка сервера. Обратитесь к администратору</b>')
+                ->message('<b>Нет доступа к секциям это раздела</b>')
                 ->markup($inlineKeyboard)
                 ->send();
 
