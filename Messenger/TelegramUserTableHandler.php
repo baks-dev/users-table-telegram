@@ -38,6 +38,7 @@ use BaksDev\Telegram\Request\Type\TelegramRequestCallback;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\UsersTable\Security\Table\Role as UserTableRole;
 use BaksDev\Users\UsersTableTelegram\Repository\UserTableInfo\UserTableInfoRepository;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -53,13 +54,13 @@ final readonly class TelegramUserTableHandler
 
     public function __construct(
         #[Target('telegramLogger')] private LoggerInterface $logger,
-        private AppCacheInterface $appCache,
         private ActiveProfileByAccountTelegramInterface $activeProfileByAccountTelegram,
         private UserTableInfoRepository $tableByRepository,
         private TemplateExtension $templateExtension,
         private Environment $environment,
         private UrlGeneratorInterface $router,
         private ?TelegramSendMessages $telegramSendMessage,
+        AppCacheInterface $appCache,
     )
     {
         $this->cache = $appCache->init('telegram');
@@ -88,7 +89,11 @@ final readonly class TelegramUserTableHandler
 
         if(false === ($profile instanceof UserProfileUid))
         {
-            $this->logger->warning(__CLASS__.':'.__LINE__.'Запрос от не авторизированного пользователя');
+            $this->logger->warning(
+                'users-table-telegram: Запрос от не авторизированного пользователя',
+                [self::class.':'.__LINE__],
+            );
+
             return;
         }
 
@@ -96,13 +101,18 @@ final readonly class TelegramUserTableHandler
 
         /**
          * Идентификатор профиля, к которому есть доступ
+         *
          * @var UserProfileUid|null $authority
          */
         $authority = $this->cache->getItem($cacheKey)->get();
 
         if(is_null($authority))
         {
-            $this->logger->warning(__CLASS__.':'.__LINE__.'Не найден идентификатор $authority', ['$authority' => $authority]);
+            $this->logger->warning(
+                'users-table-telegram: Не найден идентификатор $authority',
+                ['$authority' => $authority, self::class.':'.__LINE__],
+            );
+
             return;
         }
 
@@ -119,15 +129,19 @@ final readonly class TelegramUserTableHandler
 
         if(false === $userTableInfo)
         {
-            $this->logger->warning(__CLASS__.':'.__LINE__.'Табель учета выполненных работ не найден', ['$profile' => $profile, '$authority' => $authority]);
+            $this->logger->warning(
+                'users-table-telegram: Табель учета выполненных работ не найден',
+                ['$profile' => $profile, '$authority' => $authority, self::class.':'.__LINE__],
+            );
 
             /** Клавиатура */
             $inlineKeyboard = new ReplyKeyboardMarkup;
+
             /** Кнопка назад */
             $inlineKeyboard->addNewRow(
                 (new ReplyKeyboardButton)
                     ->setText('Выход')
-                    ->setCallbackData(TelegramDeleteMessageHandler::DELETE_KEY)
+                    ->setCallbackData(TelegramDeleteMessageHandler::DELETE_KEY),
             );
 
             /** Сообщаем об ошибке */
@@ -152,9 +166,12 @@ final readonly class TelegramUserTableHandler
                 'tableUrl' => $tableUrl,
             ]);
         }
-        catch(\Exception $exception)
+        catch(Exception $exception)
         {
-            $this->logger->critical(__CLASS__.':'.__LINE__.'Ошибка рендера шаблона @users-table-telegram:bot/table.html.twig', ['chatId' => $telegramRequest->getChatId()]);
+            $this->logger->critical(
+                'users-table-telegram: Ошибка рендера шаблона @users-table-telegram:bot/table.html.twig',
+                ['chatId' => $telegramRequest->getChatId(), self::class.':'.__LINE__],
+            );
             return;
         }
 
@@ -168,7 +185,7 @@ final readonly class TelegramUserTableHandler
             $inlineKeyboard->addNewRow(
                 (new ReplyKeyboardButton)
                     ->setText('Выход')
-                    ->setCallbackData(TelegramDeleteMessageHandler::DELETE_KEY)
+                    ->setCallbackData(TelegramDeleteMessageHandler::DELETE_KEY),
             );
 
             /** Сообщаем об ошибке */
