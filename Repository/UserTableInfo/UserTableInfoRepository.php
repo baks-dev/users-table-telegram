@@ -30,10 +30,10 @@ use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Products\Category\Entity\CategoryProduct;
 use BaksDev\Products\Category\Entity\Trans\CategoryProductTrans;
 use BaksDev\Users\Profile\Group\Entity\Users\ProfileGroupUsers;
-use BaksDev\Users\Profile\UserProfile\Entity\Avatar\UserProfileAvatar;
+use BaksDev\Users\Profile\UserProfile\Entity\Event\Avatar\UserProfileAvatar;
+use BaksDev\Users\Profile\UserProfile\Entity\Event\Info\UserProfileInfo;
+use BaksDev\Users\Profile\UserProfile\Entity\Event\Personal\UserProfilePersonal;
 use BaksDev\Users\Profile\UserProfile\Entity\Event\UserProfileEvent;
-use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
-use BaksDev\Users\Profile\UserProfile\Entity\Personal\UserProfilePersonal;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\UsersTable\Entity\Actions\Event\UsersTableActionsEvent;
@@ -45,6 +45,7 @@ use BaksDev\Users\UsersTable\Entity\Table\UsersTable;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Generator;
+use InvalidArgumentException;
 
 /** @see UserTableInfoResult */
 final class UserTableInfoRepository
@@ -87,7 +88,7 @@ final class UserTableInfoRepository
         {
             if(empty($authority))
             {
-                throw new \InvalidArgumentException('В параметр $authority передана пустая строка');
+                throw new InvalidArgumentException('В параметр $authority передана пустая строка');
             }
 
             $authority = new UserProfileUid($authority);
@@ -147,12 +148,12 @@ final class UserTableInfoRepository
 
         if(false === ($this->profile instanceof UserProfileUid))
         {
-            throw new \InvalidArgumentException('Не передан обязательный параметр запроса $profile');
+            throw new InvalidArgumentException('Не передан обязательный параметр запроса $profile');
         }
 
         if(false === ($this->authority instanceof UserProfileUid))
         {
-            throw new \InvalidArgumentException('Не передан обязательный параметр запроса $authority');
+            throw new InvalidArgumentException('Не передан обязательный параметр запроса $authority');
         }
 
         $dbal = $this->DBALQueryBuilder
