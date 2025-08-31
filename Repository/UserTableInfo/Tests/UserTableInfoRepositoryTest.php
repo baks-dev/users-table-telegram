@@ -28,13 +28,11 @@ namespace BaksDev\Users\UsersTableTelegram\Repository\UserTableInfo\Tests;
 
 use BaksDev\Users\UsersTableTelegram\Repository\UserTableInfo\UserTableInfoRepository;
 use BaksDev\Users\UsersTableTelegram\Repository\UserTableInfo\UserTableInfoResult;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group users-table
- * @group users-table-telegram
- */
+#[Group('users-table-telegram')]
 #[When(env: 'test')]
 class UserTableInfoRepositoryTest extends KernelTestCase
 {
