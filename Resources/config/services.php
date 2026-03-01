@@ -31,7 +31,8 @@ return static function(ContainerConfigurator $configurator) {
     $services = $configurator->services()
         ->defaults()
         ->autowire()
-        ->autoconfigure();
+        ->autoconfigure()
+        ->public();
 
     $NAMESPACE = BaksDevUsersTableTelegramBundle::NAMESPACE;
     $PATH = BaksDevUsersTableTelegramBundle::PATH;
