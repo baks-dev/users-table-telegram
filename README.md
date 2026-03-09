@@ -1,6 +1,6 @@
 # BaksDev UsersTable
 
-[![Version](https://img.shields.io/badge/version-7.4.1-blue)](https://github.com/baks-dev/users-table-telegram/releases)
+[![Version](https://img.shields.io/badge/version-7.4.2-blue)](https://github.com/baks-dev/users-table-telegram/releases)
 ![php 8.4+](https://img.shields.io/badge/php-min%208.4-red.svg)
 [![packagist](https://img.shields.io/badge/packagist-green)](https://packagist.org/packages/baks-dev/users-table-telegram)
 
