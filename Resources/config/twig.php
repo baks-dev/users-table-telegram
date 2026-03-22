@@ -31,7 +31,7 @@ return static function(TwigConfig $twig) {
 
     $twig->path(
         BaksDevUsersTableTelegramBundle::PATH.implode(DIRECTORY_SEPARATOR, ['Resources', 'view', '']),
-        'users-table-telegram'
+        'users-table-telegram',
     );
 
 };

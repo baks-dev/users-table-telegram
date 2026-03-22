@@ -172,7 +172,7 @@ final class UserTableInfoRepository
                 'users_table',
                 UsersTableEvent::class,
                 'event',
-                'event.id = users_table.event'
+                'event.id = users_table.event',
             );
 
         $dbal
@@ -182,7 +182,7 @@ final class UserTableInfoRepository
                 'profile_group_users',
                 '
                 profile_group_users.authority = :authority AND
-                profile_group_users.profile = :profile'
+                profile_group_users.profile = :profile',
             );
 
         /**
@@ -193,7 +193,7 @@ final class UserTableInfoRepository
                 'event',
                 UsersTableActionsWorking::class,
                 'working',
-                'working.id = event.working'
+                'working.id = event.working',
             )
             ->groupBy('working.coefficient');
 
@@ -203,7 +203,7 @@ final class UserTableInfoRepository
                 'working',
                 UsersTableActionsWorkingTrans::class,
                 'working_trans',
-                'working_trans.working = working.id AND working_trans.local = :local'
+                'working_trans.working = working.id AND working_trans.local = :local',
             )
             ->groupBy('working_trans.name');
 
@@ -211,7 +211,7 @@ final class UserTableInfoRepository
             'action_event',
             UsersTableActions::class,
             'actions',
-            'actions.id = action_event.main AND actions.profile = :authority'
+            'actions.id = action_event.main AND actions.profile = :authority',
         )
             ->setParameter('authority', $this->authority, UserProfileUid::TYPE);
 
@@ -223,7 +223,7 @@ final class UserTableInfoRepository
                 'working',
                 UsersTableActionsEvent::class,
                 'action_event',
-                'action_event.id = working.event'
+                'action_event.id = working.event',
             );
 
         $dbal
@@ -231,7 +231,7 @@ final class UserTableInfoRepository
                 'action_event',
                 CategoryProduct::class,
                 'category',
-                'category.id = action_event.category'
+                'category.id = action_event.category',
             );
 
         $dbal
@@ -240,7 +240,7 @@ final class UserTableInfoRepository
                 'category',
                 CategoryProductTrans::class,
                 'trans',
-                'trans.event = category.event AND trans.local = :local'
+                'trans.event = category.event AND trans.local = :local',
             );
 
         /** Ответственное лицо */
@@ -250,7 +250,7 @@ final class UserTableInfoRepository
                 'event',
                 UserProfile::class,
                 'users_profile',
-                'users_profile.id = event.profile'
+                'users_profile.id = event.profile',
             );
 
         $dbal
@@ -258,7 +258,7 @@ final class UserTableInfoRepository
                 'event',
                 UserProfileInfo::class,
                 'users_profile_info',
-                'users_profile_info.profile = event.profile'
+                'users_profile_info.profile = event.profile',
             );
 
         $dbal
@@ -266,7 +266,7 @@ final class UserTableInfoRepository
                 'users_profile',
                 UserProfileEvent::class,
                 'users_profile_event',
-                'users_profile_event.id = users_profile.event'
+                'users_profile_event.id = users_profile.event',
             );
 
         $dbal
@@ -275,7 +275,7 @@ final class UserTableInfoRepository
                 'users_profile_event',
                 UserProfilePersonal::class,
                 'users_profile_personal',
-                'users_profile_personal.event = users_profile_event.id'
+                'users_profile_personal.event = users_profile_event.id',
             );
 
         $dbal
@@ -283,7 +283,7 @@ final class UserTableInfoRepository
                 'users_profile_event',
                 UserProfileAvatar::class,
                 'users_profile_avatar',
-                'users_profile_avatar.event = users_profile_event.id'
+                'users_profile_avatar.event = users_profile_event.id',
             );
 
         /** Если дата не передана - показываем на текущую дату  */
